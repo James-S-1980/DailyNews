@@ -21,11 +21,38 @@ from typing import Iterable
 BASE_DIR = Path(__file__).resolve().parent
 ENV_FILE = BASE_DIR / ".env"
 LOG_DIR = BASE_DIR / "logs"
-NEWSLETTER_TITLE = "Defense Daily"
-DEFAULT_RECIPIENT = "James.d.schliesske.civ@army.mil"
+GENERAL_RECIPIENT = "james.schliesske@gmail.com"
+DEFENSE_RECIPIENT = "James.d.schliesske.civ@army.mil"
 
 
-SECTIONS = {
+GENERAL_SECTIONS = {
+    "Top News": [
+        ("CNN", "http://rss.cnn.com/rss/cnn_topstories.rss"),
+        ("NBC News", "https://feeds.nbcnews.com/nbcnews/public/news"),
+        ("BBC News", "https://feeds.bbci.co.uk/news/rss.xml"),
+        ("WSJ", "https://feeds.a.dj.com/rss/RSSWorldNews.xml"),
+        ("NPR", "https://feeds.npr.org/1001/rss.xml"),
+    ],
+    "World News": [
+        ("BBC World", "https://feeds.bbci.co.uk/news/world/rss.xml"),
+        ("CNN World", "http://rss.cnn.com/rss/cnn_world.rss"),
+        ("NBC World", "https://feeds.nbcnews.com/nbcnews/public/world"),
+        ("WSJ World", "https://feeds.a.dj.com/rss/RSSWorldNews.xml"),
+        ("NPR World", "https://feeds.npr.org/1004/rss.xml"),
+        ("Al Jazeera", "https://www.aljazeera.com/xml/rss/all.xml"),
+    ],
+    "Technology News": [
+        ("TechCrunch", "https://techcrunch.com/feed/"),
+        ("The Verge", "https://www.theverge.com/rss/index.xml"),
+        ("Ars Technica", "https://feeds.arstechnica.com/arstechnica/index"),
+        ("Wired", "https://www.wired.com/feed/rss"),
+        ("MIT Technology Review", "https://www.technologyreview.com/feed/"),
+        ("Engadget", "https://www.engadget.com/rss.xml"),
+    ],
+}
+
+
+DEFENSE_SECTIONS = {
     "Defense Headlines": [
         ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
         ("TWZ", "https://www.twz.com/feed"),
@@ -50,6 +77,26 @@ SECTIONS = {
         ("Naval News", "https://www.navalnews.com/feed/"),
         ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
     ],
+}
+
+
+NEWSLETTERS = {
+    "general": {
+        "title": "Daily Headlines",
+        "recipient_env": "GENERAL_NEWSLETTER_RECIPIENT",
+        "default_recipient": GENERAL_RECIPIENT,
+        "sections": GENERAL_SECTIONS,
+        "preview_file": "latest_general_newsletter.html",
+        "user_agent": "daily-headlines-newsletter/1.0 (+https://localhost)",
+    },
+    "defense": {
+        "title": "Defense Daily",
+        "recipient_env": "DEFENSE_NEWSLETTER_RECIPIENT",
+        "default_recipient": DEFENSE_RECIPIENT,
+        "sections": DEFENSE_SECTIONS,
+        "preview_file": "latest_defense_newsletter.html",
+        "user_agent": "defense-daily-newsletter/1.0 (+https://localhost)",
+    },
 }
 
 
@@ -149,11 +196,11 @@ def is_obviously_stale(article: Article) -> bool:
     return any(year < current_year - 1 for year in years)
 
 
-def fetch_feed(source: str, url: str, max_items: int = 8) -> list[Article]:
+def fetch_feed(source: str, url: str, user_agent: str, max_items: int = 8) -> list[Article]:
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "defense-daily-newsletter/1.0 (+https://localhost)",
+            "User-Agent": user_agent,
             "Accept": "application/rss+xml, application/xml, text/xml, */*",
         },
     )
@@ -211,14 +258,14 @@ def fetch_feed(source: str, url: str, max_items: int = 8) -> list[Article]:
     return articles
 
 
-def collect_section(feed_specs: list[tuple[str, str]], target_count: int = 8) -> list[Article]:
+def collect_section(feed_specs: list[tuple[str, str]], user_agent: str, target_count: int = 8) -> list[Article]:
     articles_by_source: list[list[Article]] = []
     seen_links: set[str] = set()
     seen_titles: set[str] = set()
 
     for source, url in feed_specs:
         source_articles: list[Article] = []
-        for article in fetch_feed(source, url):
+        for article in fetch_feed(source, url, user_agent):
             title_key = re.sub(r"\W+", "", article.title).lower()
             if article.link in seen_links or title_key in seen_titles or is_obviously_stale(article):
                 continue
@@ -250,14 +297,14 @@ def html_escape(value: str) -> str:
     return html.escape(value, quote=True)
 
 
-def build_html(sections: dict[str, list[Article]]) -> str:
+def build_html(title: str, sections: dict[str, list[Article]]) -> str:
     today = dt.datetime.now().strftime("%A, %B %-d, %Y") if os.name != "nt" else dt.datetime.now().strftime("%A, %B %#d, %Y")
     parts = [
         "<!doctype html>",
         "<html>",
         "<body style=\"margin:0;background:#f5f7fb;color:#1f2937;font-family:Arial,Helvetica,sans-serif;\">",
         "<div style=\"max-width:760px;margin:0 auto;padding:28px 18px;\">",
-        f"<h1 style=\"margin:0 0 6px;font-size:28px;color:#111827;\">{html_escape(NEWSLETTER_TITLE)}</h1>",
+        f"<h1 style=\"margin:0 0 6px;font-size:28px;color:#111827;\">{html_escape(title)}</h1>",
         f"<p style=\"margin:0 0 24px;color:#4b5563;\">{html_escape(today)}</p>",
     ]
 
@@ -288,9 +335,9 @@ def build_html(sections: dict[str, list[Article]]) -> str:
     return "\n".join(parts)
 
 
-def build_text(sections: dict[str, list[Article]]) -> str:
+def build_text(title: str, sections: dict[str, list[Article]]) -> str:
     today = dt.datetime.now().strftime("%A, %B %d, %Y")
-    lines = [f"{NEWSLETTER_TITLE} - {today}", ""]
+    lines = [f"{title} - {today}", ""]
     for section_name, articles in sections.items():
         lines.extend([section_name, "-" * len(section_name)])
         if not articles:
@@ -309,14 +356,18 @@ def build_text(sections: dict[str, list[Article]]) -> str:
     return "\n".join(lines)
 
 
-def build_newsletter() -> tuple[str, str, dict[str, list[Article]]]:
-    sections = {section: collect_section(feeds) for section, feeds in SECTIONS.items()}
-    return build_html(sections), build_text(sections), sections
+def build_newsletter(config: dict) -> tuple[str, str, dict[str, list[Article]]]:
+    user_agent = config["user_agent"]
+    sections = {
+        section: collect_section(feeds, user_agent)
+        for section, feeds in config["sections"].items()
+    }
+    title = config["title"]
+    return build_html(title, sections), build_text(title, sections), sections
 
 
-def send_email(subject: str, html_body: str, text_body: str) -> None:
-    sender = os.environ.get("SMTP_USERNAME", DEFAULT_RECIPIENT)
-    recipient = os.environ.get("NEWSLETTER_RECIPIENT", DEFAULT_RECIPIENT)
+def send_email(subject: str, html_body: str, text_body: str, recipient: str) -> None:
+    sender = os.environ.get("SMTP_USERNAME", GENERAL_RECIPIENT)
     password = os.environ.get("SMTP_APP_PASSWORD", "").replace(" ", "")
     smtp_host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
     smtp_port = int(os.environ.get("SMTP_PORT", "465"))
@@ -345,28 +396,50 @@ def log(message: str) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=f"Build and send the {NEWSLETTER_TITLE} newsletter.")
+    parser = argparse.ArgumentParser(description="Build and send the configured daily newsletters.")
+    parser.add_argument(
+        "--newsletter",
+        choices=["all", *NEWSLETTERS.keys()],
+        default="all",
+        help="Choose which newsletter to run. Defaults to all.",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Build the newsletter and print a text preview without sending.")
-    parser.add_argument("--save-html", action="store_true", help="Save the generated HTML to latest_newsletter.html.")
+    parser.add_argument("--save-html", action="store_true", help="Save the generated HTML preview files.")
     args = parser.parse_args()
 
     load_env()
     try:
-        html_body, text_body, sections = build_newsletter()
-        total = sum(len(items) for items in sections.values())
-        subject = f"{NEWSLETTER_TITLE} - {dt.datetime.now().strftime('%B %d, %Y')}"
+        selected_names = list(NEWSLETTERS) if args.newsletter == "all" else [args.newsletter]
+        failures: list[str] = []
 
-        if args.save_html or args.dry_run:
-            (BASE_DIR / "latest_newsletter.html").write_text(html_body, encoding="utf-8")
+        for name in selected_names:
+            config = NEWSLETTERS[name]
+            title = config["title"]
+            try:
+                html_body, text_body, sections = build_newsletter(config)
+                total = sum(len(items) for items in sections.values())
+                subject = f"{title} - {dt.datetime.now().strftime('%B %d, %Y')}"
+                preview_path = BASE_DIR / config["preview_file"]
+                recipient = os.environ.get(config["recipient_env"], config["default_recipient"])
 
-        if args.dry_run:
-            print(text_body)
-            print(f"\nPreview saved to {BASE_DIR / 'latest_newsletter.html'}")
-            log(f"Dry run completed with {total} articles.")
-            return 0
+                if args.save_html or args.dry_run:
+                    preview_path.write_text(html_body, encoding="utf-8")
 
-        send_email(subject, html_body, text_body)
-        log(f"Sent newsletter with {total} articles.")
+                if args.dry_run:
+                    print(text_body)
+                    print(f"\nPreview saved to {preview_path}")
+                    print()
+                    log(f"Dry run completed for {title} with {total} articles.")
+                    continue
+
+                send_email(subject, html_body, text_body, recipient)
+                log(f"Sent {title} to {recipient} with {total} articles.")
+            except Exception as exc:
+                failures.append(f"{title}: {exc}")
+                log(f"ERROR sending {title}: {exc}")
+
+        if failures:
+            raise RuntimeError("; ".join(failures))
         return 0
     except Exception as exc:
         log(f"ERROR: {exc}")

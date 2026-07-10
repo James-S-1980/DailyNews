@@ -1,5 +1,5 @@
 .env
 logs/
-latest_newsletter.html
+latest*_newsletter.html
 __pycache__/
 *.pyc

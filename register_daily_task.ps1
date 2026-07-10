@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$taskName = "Defense Daily Newsletter"
+$taskName = "Daily Newsletters"
 $scriptPath = Join-Path $projectRoot "run_newsletter.ps1"
 $powershell = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 
@@ -21,7 +21,7 @@ Register-ScheduledTask `
     -Action $action `
     -Trigger $trigger `
     -Settings $settings `
-    -Description "Sends the Defense Daily newsletter every morning at 4:00 AM." `
+    -Description "Sends the general and defense daily newsletters every morning at 4:00 AM." `
     -Force
 
 Write-Host "Registered scheduled task '$taskName' for 4:00 AM daily."
