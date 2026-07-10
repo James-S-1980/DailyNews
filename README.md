@@ -1,12 +1,12 @@
-# Daily Headlines Newsletter
+# Defense Daily Newsletter
 
-This folder contains a small daily newsletter job that collects headlines from RSS feeds, summarizes each item from the feed description, and emails the digest to `james.schliesske@gmail.com`.
+This branch contains a defense-focused daily newsletter job that collects headlines from RSS feeds, summarizes each item from the feed description, and emails the digest to `James.d.schliesske.civ@army.mil`.
 
 ## Sections
 
-- Top News: CNN, NBC News, BBC News, WSJ, NPR, Reuters
-- World News: BBC World, CNN World, NBC World, WSJ World, NPR World, Al Jazeera
-- Technology News: TechCrunch, The Verge, Ars Technica, Wired, MIT Technology Review, Engadget
+- Defense Headlines: Defense News, TWZ, Breaking Defense, Defense One, Military Times, USNI News
+- Military Services: Army Times, Air Force Times, Marine Corps Times, Navy Times, USNI News, Air & Space Forces Magazine
+- Defense Technology & Industry: C4ISRNET, Breaking Defense, Defense News, TWZ, Naval News, Air & Space Forces Magazine
 
 Each section includes up to 8 articles with a title, 2-3 sentence summary, source, and full article link.
 
@@ -30,7 +30,7 @@ The preview writes `latest_newsletter.html` and prints a plain-text version in t
 .\register_daily_task.ps1
 ```
 
-The task is registered as `Daily Headlines Newsletter` in Windows Task Scheduler.
+The task is registered as `Defense Daily Newsletter` in Windows Task Scheduler.
 
 ## Configuration
 

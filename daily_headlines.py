@@ -21,32 +21,34 @@ from typing import Iterable
 BASE_DIR = Path(__file__).resolve().parent
 ENV_FILE = BASE_DIR / ".env"
 LOG_DIR = BASE_DIR / "logs"
-DEFAULT_RECIPIENT = "james.schliesske@gmail.com"
+NEWSLETTER_TITLE = "Defense Daily"
+DEFAULT_RECIPIENT = "James.d.schliesske.civ@army.mil"
 
 
 SECTIONS = {
-    "Top News": [
-        ("CNN", "http://rss.cnn.com/rss/cnn_topstories.rss"),
-        ("NBC News", "https://feeds.nbcnews.com/nbcnews/public/news"),
-        ("BBC News", "https://feeds.bbci.co.uk/news/rss.xml"),
-        ("WSJ", "https://feeds.a.dj.com/rss/RSSWorldNews.xml"),
-        ("NPR", "https://feeds.npr.org/1001/rss.xml"),
+    "Defense Headlines": [
+        ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
+        ("TWZ", "https://www.twz.com/feed"),
+        ("Breaking Defense", "https://breakingdefense.com/feed/"),
+        ("Defense One", "https://www.defenseone.com/rss/all/"),
+        ("Military Times", "https://www.militarytimes.com/arc/outboundfeeds/rss/"),
+        ("USNI News", "https://news.usni.org/feed"),
     ],
-    "World News": [
-        ("BBC World", "https://feeds.bbci.co.uk/news/world/rss.xml"),
-        ("CNN World", "http://rss.cnn.com/rss/cnn_world.rss"),
-        ("NBC World", "https://feeds.nbcnews.com/nbcnews/public/world"),
-        ("WSJ World", "https://feeds.a.dj.com/rss/RSSWorldNews.xml"),
-        ("NPR World", "https://feeds.npr.org/1004/rss.xml"),
-        ("Al Jazeera", "https://www.aljazeera.com/xml/rss/all.xml"),
+    "Military Services": [
+        ("Army Times", "https://www.armytimes.com/arc/outboundfeeds/rss/"),
+        ("Air Force Times", "https://www.airforcetimes.com/arc/outboundfeeds/rss/"),
+        ("Marine Corps Times", "https://www.marinecorpstimes.com/arc/outboundfeeds/rss/"),
+        ("Navy Times", "https://www.navytimes.com/arc/outboundfeeds/rss/"),
+        ("USNI News", "https://news.usni.org/feed"),
+        ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
     ],
-    "Technology News": [
-        ("TechCrunch", "https://techcrunch.com/feed/"),
-        ("The Verge", "https://www.theverge.com/rss/index.xml"),
-        ("Ars Technica", "https://feeds.arstechnica.com/arstechnica/index"),
-        ("Wired", "https://www.wired.com/feed/rss"),
-        ("MIT Technology Review", "https://www.technologyreview.com/feed/"),
-        ("Engadget", "https://www.engadget.com/rss.xml"),
+    "Defense Technology & Industry": [
+        ("C4ISRNET", "https://www.c4isrnet.com/arc/outboundfeeds/rss/"),
+        ("Breaking Defense", "https://breakingdefense.com/feed/"),
+        ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
+        ("TWZ", "https://www.twz.com/feed"),
+        ("Naval News", "https://www.navalnews.com/feed/"),
+        ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
     ],
 }
 
@@ -151,7 +153,7 @@ def fetch_feed(source: str, url: str, max_items: int = 8) -> list[Article]:
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "daily-headlines-newsletter/1.0 (+https://localhost)",
+            "User-Agent": "defense-daily-newsletter/1.0 (+https://localhost)",
             "Accept": "application/rss+xml, application/xml, text/xml, */*",
         },
     )
@@ -255,7 +257,7 @@ def build_html(sections: dict[str, list[Article]]) -> str:
         "<html>",
         "<body style=\"margin:0;background:#f5f7fb;color:#1f2937;font-family:Arial,Helvetica,sans-serif;\">",
         "<div style=\"max-width:760px;margin:0 auto;padding:28px 18px;\">",
-        "<h1 style=\"margin:0 0 6px;font-size:28px;color:#111827;\">Daily Headlines</h1>",
+        f"<h1 style=\"margin:0 0 6px;font-size:28px;color:#111827;\">{html_escape(NEWSLETTER_TITLE)}</h1>",
         f"<p style=\"margin:0 0 24px;color:#4b5563;\">{html_escape(today)}</p>",
     ]
 
@@ -288,7 +290,7 @@ def build_html(sections: dict[str, list[Article]]) -> str:
 
 def build_text(sections: dict[str, list[Article]]) -> str:
     today = dt.datetime.now().strftime("%A, %B %d, %Y")
-    lines = [f"Daily Headlines - {today}", ""]
+    lines = [f"{NEWSLETTER_TITLE} - {today}", ""]
     for section_name, articles in sections.items():
         lines.extend([section_name, "-" * len(section_name)])
         if not articles:
@@ -343,7 +345,7 @@ def log(message: str) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build and send the Daily Headlines newsletter.")
+    parser = argparse.ArgumentParser(description=f"Build and send the {NEWSLETTER_TITLE} newsletter.")
     parser.add_argument("--dry-run", action="store_true", help="Build the newsletter and print a text preview without sending.")
     parser.add_argument("--save-html", action="store_true", help="Save the generated HTML to latest_newsletter.html.")
     args = parser.parse_args()
@@ -352,7 +354,7 @@ def main() -> int:
     try:
         html_body, text_body, sections = build_newsletter()
         total = sum(len(items) for items in sections.values())
-        subject = f"Daily Headlines - {dt.datetime.now().strftime('%B %d, %Y')}"
+        subject = f"{NEWSLETTER_TITLE} - {dt.datetime.now().strftime('%B %d, %Y')}"
 
         if args.save_html or args.dry_run:
             (BASE_DIR / "latest_newsletter.html").write_text(html_body, encoding="utf-8")
