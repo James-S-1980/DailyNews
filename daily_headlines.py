@@ -77,6 +77,86 @@ DEFENSE_SECTIONS = {
         ("Naval News", "https://www.navalnews.com/feed/"),
         ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
     ],
+    "C4ISR": [
+        ("C4ISRNET", "https://www.c4isrnet.com/arc/outboundfeeds/rss/"),
+        ("Breaking Defense", "https://breakingdefense.com/feed/"),
+        ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
+        ("Defense One", "https://www.defenseone.com/rss/all/"),
+        ("TWZ", "https://www.twz.com/feed"),
+        ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
+    ],
+    "Field Artillery": [
+        ("Army Times", "https://www.armytimes.com/arc/outboundfeeds/rss/"),
+        ("Military Times", "https://www.militarytimes.com/arc/outboundfeeds/rss/"),
+        ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
+        ("Breaking Defense", "https://breakingdefense.com/feed/"),
+        ("TWZ", "https://www.twz.com/feed"),
+        ("Defense One", "https://www.defenseone.com/rss/all/"),
+        ("Defence Blog", "https://defence-blog.com/feed/"),
+        ("Army Technology", "https://www.army-technology.com/feed/"),
+    ],
+}
+
+
+DEFENSE_SECTION_KEYWORDS = {
+    "C4ISR": [
+        "c4isr",
+        "command and control",
+        "jadc2",
+        "cjadc2",
+        "sensor",
+        "sensors",
+        "electronic warfare",
+        "spectrum",
+        "cyber",
+        "satellite",
+        "space force",
+        "isr",
+        "intelligence",
+        "surveillance",
+        "reconnaissance",
+        "network",
+        "networks",
+        "communications",
+        "data link",
+        "radar",
+    ],
+    "Field Artillery": [
+        "field artillery",
+        "artillery",
+        "howitzer",
+        "howitzers",
+        "cannon",
+        "long-range fires",
+        "long range fires",
+        "precision fires",
+        "fires",
+        "mlrs",
+        "himars",
+        "m270",
+        "paladin",
+        "m109",
+        "155mm",
+        "rocket artillery",
+        "counterfire",
+        "mortar",
+        "munitions",
+        "ammunition",
+        "ammo",
+        "projectile",
+        "projectiles",
+        "missile",
+        "missiles",
+        "rocket",
+        "rockets",
+        "launcher",
+        "launchers",
+        "strike",
+        "strikes",
+        "fire support",
+        "surface-to-surface",
+        "land warfare",
+    ],
 }
 
 
@@ -94,6 +174,7 @@ NEWSLETTERS = {
         "recipient_env": "DEFENSE_NEWSLETTER_RECIPIENT",
         "default_recipient": DEFENSE_RECIPIENT,
         "sections": DEFENSE_SECTIONS,
+        "section_keywords": DEFENSE_SECTION_KEYWORDS,
         "preview_file": "latest_defense_newsletter.html",
         "user_agent": "defense-daily-newsletter/1.0 (+https://localhost)",
     },
@@ -196,6 +277,13 @@ def is_obviously_stale(article: Article) -> bool:
     return any(year < current_year - 1 for year in years)
 
 
+def matches_keywords(article: Article, keywords: list[str] | None) -> bool:
+    if not keywords:
+        return True
+    haystack = f"{article.title} {article.summary}".lower()
+    return any(keyword.lower() in haystack for keyword in keywords)
+
+
 def fetch_feed(source: str, url: str, user_agent: str, max_items: int = 8) -> list[Article]:
     request = urllib.request.Request(
         url,
@@ -258,7 +346,12 @@ def fetch_feed(source: str, url: str, user_agent: str, max_items: int = 8) -> li
     return articles
 
 
-def collect_section(feed_specs: list[tuple[str, str]], user_agent: str, target_count: int = 8) -> list[Article]:
+def collect_section(
+    feed_specs: list[tuple[str, str]],
+    user_agent: str,
+    keywords: list[str] | None = None,
+    target_count: int = 8,
+) -> list[Article]:
     articles_by_source: list[list[Article]] = []
     seen_links: set[str] = set()
     seen_titles: set[str] = set()
@@ -267,7 +360,12 @@ def collect_section(feed_specs: list[tuple[str, str]], user_agent: str, target_c
         source_articles: list[Article] = []
         for article in fetch_feed(source, url, user_agent):
             title_key = re.sub(r"\W+", "", article.title).lower()
-            if article.link in seen_links or title_key in seen_titles or is_obviously_stale(article):
+            if (
+                article.link in seen_links
+                or title_key in seen_titles
+                or is_obviously_stale(article)
+                or not matches_keywords(article, keywords)
+            ):
                 continue
             seen_links.add(article.link)
             seen_titles.add(title_key)
@@ -358,8 +456,9 @@ def build_text(title: str, sections: dict[str, list[Article]]) -> str:
 
 def build_newsletter(config: dict) -> tuple[str, str, dict[str, list[Article]]]:
     user_agent = config["user_agent"]
+    section_keywords = config.get("section_keywords", {})
     sections = {
-        section: collect_section(feeds, user_agent)
+        section: collect_section(feeds, user_agent, section_keywords.get(section))
         for section, feeds in config["sections"].items()
     }
     title = config["title"]

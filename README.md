@@ -20,8 +20,10 @@ Defense newsletter:
 - Defense Headlines: Defense News, TWZ, Breaking Defense, Defense One, Military Times, USNI News
 - Military Services: Army Times, Air Force Times, Marine Corps Times, Navy Times, USNI News, Air & Space Forces Magazine
 - Defense Technology & Industry: C4ISRNET, Breaking Defense, Defense News, TWZ, Naval News, Air & Space Forces Magazine
+- C4ISR: C4ISRNET, Breaking Defense, Defense News, Defense One, TWZ, Air & Space Forces Magazine
+- Field Artillery: Army Times, Military Times, Defense News, Breaking Defense, TWZ, Defense One, Defence Blog, Army Technology
 
-Each section includes up to 8 articles with a title, 2-3 sentence summary, source, and full article link.
+Each section includes up to 8 articles with a title, 2-3 sentence summary, source, and full article link. The C4ISR and Field Artillery sections use keyword filters to keep broad defense feeds focused on those topics.
 
 ## Run a Preview
 
