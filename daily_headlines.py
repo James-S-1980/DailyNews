@@ -284,6 +284,72 @@ def matches_keywords(article: Article, keywords: list[str] | None) -> bool:
     return any(keyword.lower() in haystack for keyword in keywords)
 
 
+def is_probably_english(article: Article) -> bool:
+    text = f"{article.title} {article.summary}".lower()
+    if "telemundo.com" in article.link.lower():
+        return False
+    if re.search(r"[¿¡ñ]", text):
+        return False
+
+    words = re.findall(r"[a-záéíóúü]+", text)
+    if not words:
+        return True
+
+    spanish_words = {
+        "asi",
+        "así",
+        "con",
+        "del",
+        "de",
+        "el",
+        "en",
+        "esta",
+        "este",
+        "la",
+        "las",
+        "los",
+        "marruecos",
+        "para",
+        "por",
+        "que",
+        "se",
+        "su",
+        "tras",
+        "una",
+        "un",
+        "y",
+    }
+    english_words = {
+        "a",
+        "about",
+        "after",
+        "and",
+        "as",
+        "for",
+        "from",
+        "has",
+        "in",
+        "is",
+        "of",
+        "on",
+        "said",
+        "says",
+        "the",
+        "this",
+        "to",
+        "with",
+    }
+    spanish_count = sum(1 for word in words if word in spanish_words)
+    english_count = sum(1 for word in words if word in english_words)
+    accented_count = len(re.findall(r"[áéíóúü]", text))
+
+    if spanish_count >= 3 and spanish_count > english_count:
+        return False
+    if accented_count >= 2 and spanish_count >= english_count:
+        return False
+    return True
+
+
 def fetch_feed(source: str, url: str, user_agent: str, max_items: int = 8) -> list[Article]:
     request = urllib.request.Request(
         url,
@@ -364,6 +430,7 @@ def collect_section(
                 article.link in seen_links
                 or title_key in seen_titles
                 or is_obviously_stale(article)
+                or not is_probably_english(article)
                 or not matches_keywords(article, keywords)
             ):
                 continue
