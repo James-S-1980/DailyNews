@@ -1,3 +1,8 @@
+param(
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$ScriptArgs
+)
+
 $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -29,5 +34,5 @@ if (-not $python) {
     throw "Python was not found. Install Python 3.10+ or add it to PATH."
 }
 
-& $python "$projectRoot\daily_headlines.py"
+& $python "$projectRoot\daily_headlines.py" @ScriptArgs
 exit $LASTEXITCODE

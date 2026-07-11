@@ -54,6 +54,8 @@ python .\daily_headlines.py --newsletter defense --dry-run
 
 The task is registered as `Daily Newsletters` in Windows Task Scheduler.
 
+Scheduled runs use `--once-per-day`, so the 4 AM task and logon catch-up will not send duplicate newsletters on the same date. The logon catch-up also uses `--not-before 04:00`, so logging in before 4 AM does not send early.
+
 ## Configuration
 
 Email configuration lives in `.env`. The file is intentionally ignored by Git because it contains the Gmail app password. Use `GENERAL_NEWSLETTER_RECIPIENT` and `DEFENSE_NEWSLETTER_RECIPIENT` to change destinations.

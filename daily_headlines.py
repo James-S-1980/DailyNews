@@ -561,6 +561,27 @@ def log(message: str) -> None:
         handle.write(f"[{stamp}] {message}\n")
 
 
+def already_sent_today(title: str) -> bool:
+    log_path = LOG_DIR / "newsletter.log"
+    if not log_path.exists():
+        return False
+    today = dt.datetime.now().strftime("%Y-%m-%d")
+    marker = f"Sent {title} "
+    for line in log_path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        if line.startswith(f"[{today} ") and marker in line:
+            return True
+    return False
+
+
+def before_local_time(value: str) -> bool:
+    try:
+        hour_text, minute_text = value.split(":", 1)
+        not_before = dt.time(hour=int(hour_text), minute=int(minute_text))
+    except ValueError as exc:
+        raise ValueError("--not-before must use HH:MM format") from exc
+    return dt.datetime.now().time() < not_before
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build and send the configured daily newsletters.")
     parser.add_argument(
@@ -571,10 +592,23 @@ def main() -> int:
     )
     parser.add_argument("--dry-run", action="store_true", help="Build the newsletter and print a text preview without sending.")
     parser.add_argument("--save-html", action="store_true", help="Save the generated HTML preview files.")
+    parser.add_argument(
+        "--once-per-day",
+        action="store_true",
+        help="Skip sending a newsletter if it already succeeded today. Intended for scheduled runs.",
+    )
+    parser.add_argument(
+        "--not-before",
+        help="Skip sending until this local HH:MM time. Intended for logon catch-up runs.",
+    )
     args = parser.parse_args()
 
     load_env()
     try:
+        if args.not_before and before_local_time(args.not_before):
+            log(f"Skipped run; current time is before {args.not_before}.")
+            return 0
+
         selected_names = list(NEWSLETTERS) if args.newsletter == "all" else [args.newsletter]
         failures: list[str] = []
 
@@ -582,6 +616,10 @@ def main() -> int:
             config = NEWSLETTERS[name]
             title = config["title"]
             try:
+                if args.once_per_day and not args.dry_run and already_sent_today(title):
+                    log(f"Skipped {title}; already sent today.")
+                    continue
+
                 html_body, text_body, sections = build_newsletter(config)
                 total = sum(len(items) for items in sections.values())
                 subject = f"{title} - {dt.datetime.now().strftime('%B %d, %Y')}"
