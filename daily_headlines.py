@@ -23,6 +23,7 @@ ENV_FILE = BASE_DIR / ".env"
 LOG_DIR = BASE_DIR / "logs"
 GENERAL_RECIPIENT = "james.schliesske@gmail.com"
 DEFENSE_RECIPIENT = "James.d.schliesske.civ@army.mil"
+DEFAULT_MAX_ARTICLE_AGE_DAYS = 3
 
 
 GENERAL_SECTIONS = {
@@ -277,6 +278,25 @@ def is_obviously_stale(article: Article) -> bool:
     return any(year < current_year - 1 for year in years)
 
 
+def max_article_age() -> dt.timedelta:
+    raw_value = os.environ.get("MAX_ARTICLE_AGE_DAYS", str(DEFAULT_MAX_ARTICLE_AGE_DAYS))
+    try:
+        days = float(raw_value)
+    except ValueError:
+        days = DEFAULT_MAX_ARTICLE_AGE_DAYS
+    return dt.timedelta(days=max(days, 0.25))
+
+
+def is_recent(article: Article, max_age: dt.timedelta) -> bool:
+    published = article.published
+    if published.tzinfo is None:
+        published = published.replace(tzinfo=dt.timezone.utc)
+    now = dt.datetime.now(dt.timezone.utc)
+    if published > now + dt.timedelta(hours=12):
+        return False
+    return now - published.astimezone(dt.timezone.utc) <= max_age
+
+
 def matches_keywords(article: Article, keywords: list[str] | None) -> bool:
     if not keywords:
         return True
@@ -421,6 +441,7 @@ def collect_section(
     articles_by_source: list[list[Article]] = []
     seen_links: set[str] = set()
     seen_titles: set[str] = set()
+    recent_age = max_article_age()
 
     for source, url in feed_specs:
         source_articles: list[Article] = []
@@ -430,6 +451,7 @@ def collect_section(
                 article.link in seen_links
                 or title_key in seen_titles
                 or is_obviously_stale(article)
+                or not is_recent(article, recent_age)
                 or not is_probably_english(article)
                 or not matches_keywords(article, keywords)
             ):

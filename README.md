@@ -59,3 +59,5 @@ Scheduled runs use `--once-per-day`, so the 4 AM task and logon catch-up will no
 ## Configuration
 
 Email configuration lives in `.env`. The file is intentionally ignored by Git because it contains the Gmail app password. Use `GENERAL_NEWSLETTER_RECIPIENT` and `DEFENSE_NEWSLETTER_RECIPIENT` to change destinations.
+
+By default, articles older than 3 days are excluded. Set `MAX_ARTICLE_AGE_DAYS` in `.env` to adjust the recency window.
