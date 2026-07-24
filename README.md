@@ -17,8 +17,8 @@ General newsletter:
 
 Defense newsletter:
 
-- Defense Headlines: Defense News, TWZ, Breaking Defense, Defense One, Military Times, USNI News
-- Military Services: Army Times, Air Force Times, Marine Corps Times, Navy Times, USNI News, Air & Space Forces Magazine
+- Defense Headlines: Defense News, Stars and Stripes, TWZ, Breaking Defense, Defense One, Military Times, USNI News
+- Military Services: Army Times, Air Force Times, Marine Corps Times, Navy Times, Stars and Stripes U.S., USNI News, Air & Space Forces Magazine
 - Defense Technology & Industry: C4ISRNET, Breaking Defense, Defense News, TWZ, Naval News, Air & Space Forces Magazine
 - C4ISR: C4ISRNET, Breaking Defense, Defense News, Defense One, TWZ, Air & Space Forces Magazine
 - Field Artillery: Army Times, Military Times, Defense News, Breaking Defense, TWZ, Defense One, Defence Blog, Army Technology

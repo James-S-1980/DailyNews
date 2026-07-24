@@ -56,6 +56,7 @@ GENERAL_SECTIONS = {
 DEFENSE_SECTIONS = {
     "Defense Headlines": [
         ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
+        ("Stars and Stripes", "https://subscribe.stripes.com/rss/top-news.xml"),
         ("TWZ", "https://www.twz.com/feed"),
         ("Breaking Defense", "https://breakingdefense.com/feed/"),
         ("Defense One", "https://www.defenseone.com/rss/all/"),
@@ -67,6 +68,7 @@ DEFENSE_SECTIONS = {
         ("Air Force Times", "https://www.airforcetimes.com/arc/outboundfeeds/rss/"),
         ("Marine Corps Times", "https://www.marinecorpstimes.com/arc/outboundfeeds/rss/"),
         ("Navy Times", "https://www.navytimes.com/arc/outboundfeeds/rss/"),
+        ("Stars and Stripes U.S.", "https://subscribe.stripes.com/rss/us.xml"),
         ("USNI News", "https://news.usni.org/feed"),
         ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
     ],
