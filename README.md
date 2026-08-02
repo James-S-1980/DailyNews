@@ -46,6 +46,19 @@ python .\daily_headlines.py --newsletter defense --dry-run
 .\run_newsletter.ps1
 ```
 
+## Experimental Podcast
+
+This branch can generate a separate podcast-style audio email for the daily commute.
+
+```powershell
+python .\daily_headlines.py --podcast-only
+python .\daily_headlines.py --with-podcast
+```
+
+Set `SEND_PODCAST=true` in `.env` to include the podcast in scheduled runs after `OPENAI_API_KEY` is configured. The podcast email goes to `PODCAST_RECIPIENT`, defaults to the Gmail inbox, and attaches the generated audio file. By default, `PODCAST_NEWSLETTERS=general,defense` so the episode has enough source material for a 15-25 minute commute-length summary.
+
+For realistic voice audio, set `OPENAI_API_KEY` in `.env`. The app uses OpenAI's speech endpoint with `PODCAST_TTS_MODEL=gpt-4o-mini-tts` and `PODCAST_TTS_VOICE=ash` by default. Without `OPENAI_API_KEY`, `--dry-run` falls back to Windows speech synthesis for local testing, but real sends fail instead of emailing an oversized robotic `.wav` file.
+
 ## Schedule for 4 AM Daily
 
 ```powershell
