@@ -17,13 +17,13 @@ General newsletter:
 
 Defense newsletter:
 
-- Defense Headlines: Defense News, Stars and Stripes, TWZ, Breaking Defense, Defense One, Military Times, USNI News
-- Military Services: Army Times, Air Force Times, Marine Corps Times, Navy Times, Stars and Stripes U.S., USNI News, Air & Space Forces Magazine
-- Defense Technology & Industry: C4ISRNET, Breaking Defense, Defense News, TWZ, Naval News, Air & Space Forces Magazine
-- C4ISR: C4ISRNET, Breaking Defense, Defense News, Defense One, TWZ, Air & Space Forces Magazine
+- Defense Headlines: War.gov News, Defense News, Stars and Stripes, TWZ, Breaking Defense, Defense One, Military Times, USNI News, RealClearDefense, War on the Rocks
+- Military Services: Army Times, Air Force Times, Marine Corps Times, Navy Times, Stars and Stripes U.S., USNI News, Air & Space Forces Magazine, Air Force, Army Technology, Naval Technology, Airforce Technology
+- Defense Technology & Industry: DARPA, C4ISRNET, Breaking Defense, Defense News, TWZ, Naval News, Air & Space Forces Magazine, GovCon Wire, ExecutiveGov, Army Technology, Naval Technology, Airforce Technology
+- C4ISR: DARPA, C4ISRNET, Breaking Defense, Defense News, Defense One, TWZ, Air & Space Forces Magazine, GovCon Wire, ExecutiveGov, Airforce Technology
 - Field Artillery: Army Times, Military Times, Defense News, Breaking Defense, TWZ, Defense One, Defence Blog, Army Technology
 
-Each section includes up to 8 articles with a title, 2-3 sentence summary, source, and full article link. The C4ISR and Field Artillery sections use keyword filters to keep broad defense feeds focused on those topics.
+Each section includes up to 8 articles with a title, 2-3 sentence summary, source, and full article link. The C4ISR and Field Artillery sections use keyword filters to keep broad defense feeds focused on those topics. Each newsletter closes with a "This Day in History" item for the issue date.
 
 ## Run a Preview
 

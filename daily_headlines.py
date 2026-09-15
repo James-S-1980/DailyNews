@@ -2,6 +2,7 @@ import argparse
 import datetime as dt
 import email.utils
 import html
+import json
 import os
 import re
 import smtplib
@@ -55,6 +56,7 @@ GENERAL_SECTIONS = {
 
 DEFENSE_SECTIONS = {
     "Defense Headlines": [
+        ("War.gov News", "https://www.war.gov/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=945&Category=16349&max=10"),
         ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
         ("Stars and Stripes", "https://subscribe.stripes.com/rss/top-news.xml"),
         ("TWZ", "https://www.twz.com/feed"),
@@ -62,6 +64,8 @@ DEFENSE_SECTIONS = {
         ("Defense One", "https://www.defenseone.com/rss/all/"),
         ("Military Times", "https://www.militarytimes.com/arc/outboundfeeds/rss/"),
         ("USNI News", "https://news.usni.org/feed"),
+        ("RealClearDefense", "https://www.realcleardefense.com/index.xml"),
+        ("War on the Rocks", "https://warontherocks.com/feed/"),
     ],
     "Military Services": [
         ("Army Times", "https://www.armytimes.com/arc/outboundfeeds/rss/"),
@@ -71,22 +75,36 @@ DEFENSE_SECTIONS = {
         ("Stars and Stripes U.S.", "https://subscribe.stripes.com/rss/us.xml"),
         ("USNI News", "https://news.usni.org/feed"),
         ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
+        ("Air Force", "https://www.af.mil/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=1&Category=755&max=10"),
+        ("Army Technology", "https://www.army-technology.com/feed/"),
+        ("Naval Technology", "https://www.naval-technology.com/feed/"),
+        ("Airforce Technology", "https://www.airforce-technology.com/feed/"),
     ],
     "Defense Technology & Industry": [
+        ("DARPA", "https://www.darpa.mil/rss.xml"),
         ("C4ISRNET", "https://www.c4isrnet.com/arc/outboundfeeds/rss/"),
         ("Breaking Defense", "https://breakingdefense.com/feed/"),
         ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
         ("TWZ", "https://www.twz.com/feed"),
         ("Naval News", "https://www.navalnews.com/feed/"),
         ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
+        ("GovCon Wire", "https://www.govconwire.com/feed/"),
+        ("ExecutiveGov", "https://executivegov.com/feed/"),
+        ("Army Technology", "https://www.army-technology.com/feed/"),
+        ("Naval Technology", "https://www.naval-technology.com/feed/"),
+        ("Airforce Technology", "https://www.airforce-technology.com/feed/"),
     ],
     "C4ISR": [
+        ("DARPA", "https://www.darpa.mil/rss.xml"),
         ("C4ISRNET", "https://www.c4isrnet.com/arc/outboundfeeds/rss/"),
         ("Breaking Defense", "https://breakingdefense.com/feed/"),
         ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
         ("Defense One", "https://www.defenseone.com/rss/all/"),
         ("TWZ", "https://www.twz.com/feed"),
         ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
+        ("GovCon Wire", "https://www.govconwire.com/feed/"),
+        ("ExecutiveGov", "https://executivegov.com/feed/"),
+        ("Airforce Technology", "https://www.airforce-technology.com/feed/"),
     ],
     "Field Artillery": [
         ("Army Times", "https://www.armytimes.com/arc/outboundfeeds/rss/"),
@@ -115,7 +133,6 @@ DEFENSE_SECTION_KEYWORDS = {
         "satellite",
         "space force",
         "isr",
-        "intelligence",
         "surveillance",
         "reconnaissance",
         "network",
@@ -130,35 +147,57 @@ DEFENSE_SECTION_KEYWORDS = {
         "howitzer",
         "howitzers",
         "cannon",
+        "tube artillery",
         "long-range fires",
         "long range fires",
         "precision fires",
-        "fires",
         "mlrs",
         "himars",
         "m270",
         "paladin",
         "m109",
         "155mm",
+        "105mm",
         "rocket artillery",
         "counterfire",
         "mortar",
-        "munitions",
-        "ammunition",
-        "ammo",
+        "mortars",
+        "shell",
+        "shells",
         "projectile",
         "projectiles",
-        "missile",
-        "missiles",
-        "rocket",
-        "rockets",
-        "launcher",
-        "launchers",
-        "strike",
-        "strikes",
         "fire support",
         "surface-to-surface",
-        "land warfare",
+    ],
+}
+
+DEFENSE_SECTION_EXCLUDE_KEYWORDS = {
+    "C4ISR": [
+        "artillery",
+        "howitzer",
+        "himars",
+        "mortar",
+    ],
+    "Field Artillery": [
+        "submarine",
+        "submarines",
+        "naval",
+        "navy",
+        "ship",
+        "ships",
+        "destroyer",
+        "frigate",
+        "battleship",
+        "aircraft carrier",
+        "carrier strike group",
+        "fighter jet",
+        "bomber",
+        "drone boat",
+        "unmanned vessel",
+        "cyber",
+        "satellite",
+        "space force",
+        "radar",
     ],
 }
 
@@ -178,6 +217,7 @@ NEWSLETTERS = {
         "default_recipient": DEFENSE_RECIPIENT,
         "sections": DEFENSE_SECTIONS,
         "section_keywords": DEFENSE_SECTION_KEYWORDS,
+        "section_exclude_keywords": DEFENSE_SECTION_EXCLUDE_KEYWORDS,
         "preview_file": "latest_defense_newsletter.html",
         "user_agent": "defense-daily-newsletter/1.0 (+https://localhost)",
     },
@@ -191,6 +231,13 @@ class Article:
     source: str
     link: str
     published: dt.datetime
+
+
+@dataclass(frozen=True)
+class HistoryEvent:
+    year: int
+    text: str
+    link: str
 
 
 def load_env() -> None:
@@ -299,11 +346,36 @@ def is_recent(article: Article, max_age: dt.timedelta) -> bool:
     return now - published.astimezone(dt.timezone.utc) <= max_age
 
 
+def article_key(article: Article) -> tuple[str, str]:
+    link = article.link.lower().strip()
+    link = re.sub(r"#.*$", "", link)
+    link = re.sub(r"\?.*$", "", link)
+    link = link.rstrip("/")
+    title = re.sub(r"\W+", "", article.title).lower()
+    return link, title
+
+
+def keyword_in_text(keyword: str, text: str) -> bool:
+    escaped = re.escape(keyword.lower()).replace(r"\ ", r"\s+")
+    return re.search(rf"(?<![a-z0-9]){escaped}(?![a-z0-9])", text) is not None
+
+
 def matches_keywords(article: Article, keywords: list[str] | None) -> bool:
     if not keywords:
         return True
     haystack = f"{article.title} {article.summary}".lower()
-    return any(keyword.lower() in haystack for keyword in keywords)
+    return any(keyword_in_text(keyword, haystack) for keyword in keywords)
+
+
+def matches_section_rules(
+    article: Article,
+    keywords: list[str] | None,
+    excluded_keywords: list[str] | None = None,
+) -> bool:
+    haystack = f"{article.title} {article.summary}".lower()
+    if excluded_keywords and any(keyword_in_text(keyword, haystack) for keyword in excluded_keywords):
+        return False
+    return matches_keywords(article, keywords)
 
 
 def is_probably_english(article: Article) -> bool:
@@ -438,7 +510,10 @@ def collect_section(
     feed_specs: list[tuple[str, str]],
     user_agent: str,
     keywords: list[str] | None = None,
+    excluded_keywords: list[str] | None = None,
     target_count: int = 8,
+    newsletter_seen_links: set[str] | None = None,
+    newsletter_seen_titles: set[str] | None = None,
 ) -> list[Article]:
     articles_by_source: list[list[Article]] = []
     seen_links: set[str] = set()
@@ -448,17 +523,19 @@ def collect_section(
     for source, url in feed_specs:
         source_articles: list[Article] = []
         for article in fetch_feed(source, url, user_agent):
-            title_key = re.sub(r"\W+", "", article.title).lower()
+            link_key, title_key = article_key(article)
             if (
-                article.link in seen_links
+                link_key in seen_links
                 or title_key in seen_titles
+                or (newsletter_seen_links is not None and link_key in newsletter_seen_links)
+                or (newsletter_seen_titles is not None and title_key in newsletter_seen_titles)
                 or is_obviously_stale(article)
                 or not is_recent(article, recent_age)
                 or not is_probably_english(article)
-                or not matches_keywords(article, keywords)
+                or not matches_section_rules(article, keywords, excluded_keywords)
             ):
                 continue
-            seen_links.add(article.link)
+            seen_links.add(link_key)
             seen_titles.add(title_key)
             source_articles.append(article)
         source_articles.sort(key=lambda item: item.published, reverse=True)
@@ -472,7 +549,13 @@ def collect_section(
         added = False
         for source_articles in articles_by_source:
             if index < len(source_articles):
-                selected.append(source_articles[index])
+                article = source_articles[index]
+                link_key, title_key = article_key(article)
+                selected.append(article)
+                if newsletter_seen_links is not None:
+                    newsletter_seen_links.add(link_key)
+                if newsletter_seen_titles is not None:
+                    newsletter_seen_titles.add(title_key)
                 added = True
                 if len(selected) == target_count:
                     break
@@ -482,12 +565,60 @@ def collect_section(
     return selected
 
 
+def fetch_this_day_in_history(issue_date: dt.date, user_agent: str) -> HistoryEvent | None:
+    url = f"https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/selected/{issue_date:%m}/{issue_date:%d}"
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": user_agent,
+            "Accept": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+        log(f"This day in history failed: {url} ({exc})")
+        return None
+
+    events = payload.get("selected", [])
+    candidates: list[HistoryEvent] = []
+    for event in events:
+        text = clean_text(event.get("text", ""))
+        year = event.get("year")
+        if not text or not isinstance(year, int):
+            continue
+        pages = event.get("pages") or []
+        link = ""
+        if pages:
+            content_urls = pages[0].get("content_urls", {})
+            desktop_urls = content_urls.get("desktop", {})
+            link = desktop_urls.get("page", "")
+        candidates.append(HistoryEvent(year=year, text=text, link=link))
+
+    if not candidates:
+        return None
+
+    def event_score(event: HistoryEvent) -> tuple[int, int, int]:
+        has_link = 1 if event.link else 0
+        modern_weight = 1 if event.year >= 1500 else 0
+        return has_link, modern_weight, len(event.text)
+
+    return max(candidates, key=event_score)
+
+
 def html_escape(value: str) -> str:
     return html.escape(value, quote=True)
 
 
-def build_html(title: str, sections: dict[str, list[Article]]) -> str:
-    today = dt.datetime.now().strftime("%A, %B %-d, %Y") if os.name != "nt" else dt.datetime.now().strftime("%A, %B %#d, %Y")
+def display_date(issue_date: dt.date) -> str:
+    if os.name == "nt":
+        return issue_date.strftime("%A, %B %#d, %Y")
+    return issue_date.strftime("%A, %B %-d, %Y")
+
+
+def build_html(title: str, sections: dict[str, list[Article]], history_event: HistoryEvent | None, issue_date: dt.date) -> str:
+    today = display_date(issue_date)
     parts = [
         "<!doctype html>",
         "<html>",
@@ -513,6 +644,24 @@ def build_html(title: str, sections: dict[str, list[Article]]) -> str:
                 ]
             )
 
+    parts.append("<h2 style=\"border-bottom:2px solid #d1d5db;padding-bottom:8px;margin:28px 0 14px;color:#111827;\">This Day in History</h2>")
+    if history_event:
+        link_html = (
+            f" <a href=\"{html_escape(history_event.link)}\" style=\"color:#2563eb;\">Read more</a>"
+            if history_event.link
+            else ""
+        )
+        parts.extend(
+            [
+                "<div style=\"background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:0 0 14px;\">",
+                f"<h3 style=\"font-size:18px;line-height:1.35;margin:0 0 8px;\">{history_event.year}</h3>",
+                f"<p style=\"font-size:14px;line-height:1.55;margin:0;\">{html_escape(history_event.text)}{link_html}</p>",
+                "</div>",
+            ]
+        )
+    else:
+        parts.append("<p>No history item was available this morning.</p>")
+
     parts.extend(
         [
             "<p style=\"font-size:12px;color:#6b7280;margin-top:28px;\">Generated automatically from RSS feeds. Some linked articles may require a subscription.</p>",
@@ -524,8 +673,8 @@ def build_html(title: str, sections: dict[str, list[Article]]) -> str:
     return "\n".join(parts)
 
 
-def build_text(title: str, sections: dict[str, list[Article]]) -> str:
-    today = dt.datetime.now().strftime("%A, %B %d, %Y")
+def build_text(title: str, sections: dict[str, list[Article]], history_event: HistoryEvent | None, issue_date: dt.date) -> str:
+    today = issue_date.strftime("%A, %B %d, %Y")
     lines = [f"{title} - {today}", ""]
     for section_name, articles in sections.items():
         lines.extend([section_name, "-" * len(section_name)])
@@ -542,18 +691,41 @@ def build_text(title: str, sections: dict[str, list[Article]]) -> str:
                     "",
                 ]
             )
+
+    lines.extend(["This Day in History", "-------------------"])
+    if history_event:
+        lines.extend(
+            [
+                f"{history_event.year}: {history_event.text}",
+                f"Link: {history_event.link}" if history_event.link else "",
+                "",
+            ]
+        )
+    else:
+        lines.extend(["No history item was available this morning.", ""])
     return "\n".join(lines)
 
 
 def build_newsletter(config: dict) -> tuple[str, str, dict[str, list[Article]]]:
     user_agent = config["user_agent"]
     section_keywords = config.get("section_keywords", {})
-    sections = {
-        section: collect_section(feeds, user_agent, section_keywords.get(section))
-        for section, feeds in config["sections"].items()
-    }
+    section_exclude_keywords = config.get("section_exclude_keywords", {})
+    newsletter_seen_links: set[str] = set()
+    newsletter_seen_titles: set[str] = set()
+    sections: dict[str, list[Article]] = {}
+    for section, feeds in config["sections"].items():
+        sections[section] = collect_section(
+            feeds,
+            user_agent,
+            section_keywords.get(section),
+            section_exclude_keywords.get(section),
+            newsletter_seen_links=newsletter_seen_links,
+            newsletter_seen_titles=newsletter_seen_titles,
+        )
     title = config["title"]
-    return build_html(title, sections), build_text(title, sections), sections
+    issue_date = dt.datetime.now().date()
+    history_event = fetch_this_day_in_history(issue_date, user_agent)
+    return build_html(title, sections, history_event, issue_date), build_text(title, sections, history_event, issue_date), sections
 
 
 def send_email(subject: str, html_body: str, text_body: str, recipient: str) -> None:
@@ -583,6 +755,10 @@ def log(message: str) -> None:
     stamp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with (LOG_DIR / "newsletter.log").open("a", encoding="utf-8") as handle:
         handle.write(f"[{stamp}] {message}\n")
+
+
+def safe_print(value: str = "") -> None:
+    print(value.encode(sys.stdout.encoding or "utf-8", errors="replace").decode(sys.stdout.encoding or "utf-8"))
 
 
 def already_sent_today(title: str) -> bool:
@@ -654,9 +830,9 @@ def main() -> int:
                     preview_path.write_text(html_body, encoding="utf-8")
 
                 if args.dry_run:
-                    print(text_body)
-                    print(f"\nPreview saved to {preview_path}")
-                    print()
+                    safe_print(text_body)
+                    safe_print(f"\nPreview saved to {preview_path}")
+                    safe_print()
                     log(f"Dry run completed for {title} with {total} articles.")
                     continue
 
