@@ -17,6 +17,7 @@ General newsletter:
 
 Defense newsletter:
 
+- Army Aviation: Army Aviation Magazine, Army Times, DVIDS Army, Defense News Air, Vertical Mag, Rotor & Wing, Aviation Week, Army Technology, and broad defense aviation feeds
 - Army: Army Times, DVIDS Army, Army Technology, and broad defense feeds
 - Marines: Marine Corps Times, Marines.mil, DVIDS Marines, and broad defense feeds
 - Air Force: Air Force Times, Air & Space Forces Magazine, Air Force, DVIDS Air Force, Airforce Technology, and broad defense feeds
@@ -65,3 +66,5 @@ Scheduled runs use `--once-per-day`, so the 4 AM task and logon catch-up will no
 Email configuration lives in `.env`. The file is intentionally ignored by Git because it contains the Gmail app password. Use `GENERAL_NEWSLETTER_RECIPIENT` and `DEFENSE_NEWSLETTER_RECIPIENT` to change destinations.
 
 By default, articles older than 3 days are excluded. Set `MAX_ARTICLE_AGE_DAYS` in `.env` to adjust the recency window.
+
+The Army Aviation section uses a 7-day recency window because fresh, narrowly Army aviation-specific RSS items are less frequent than broader defense news.

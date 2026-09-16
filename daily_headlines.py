@@ -25,6 +25,9 @@ LOG_DIR = BASE_DIR / "logs"
 GENERAL_RECIPIENT = "james.schliesske@gmail.com"
 DEFENSE_RECIPIENT = "James.d.schliesske.civ@army.mil"
 DEFAULT_MAX_ARTICLE_AGE_DAYS = 3
+DEFENSE_SECTION_MAX_ARTICLE_AGE_DAYS = {
+    "Army Aviation": 7,
+}
 
 
 GENERAL_SECTIONS = {
@@ -98,6 +101,20 @@ DEFENSE_FMS_FEEDS = [
 
 
 DEFENSE_SECTIONS = {
+    "Army Aviation": [
+        ("Army Aviation Magazine", "https://armyaviationmagazine.com/feed/"),
+        ("Army Times", "https://www.armytimes.com/arc/outboundfeeds/rss/"),
+        ("DVIDS Army", "https://www.dvidshub.net/rss/news?branch=Army"),
+        ("Defense News Air", "https://www.defensenews.com/arc/outboundfeeds/rss/category/air/"),
+        ("Vertical Mag", "https://verticalmag.com/feed/"),
+        ("Rotor & Wing", "https://www.rotorandwing.com/feed/"),
+        ("Aviation Week", "https://aviationweek.com/rss.xml"),
+        ("Army Technology", "https://www.army-technology.com/feed/"),
+        ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
+        ("Breaking Defense", "https://breakingdefense.com/feed/"),
+        ("TWZ", "https://www.twz.com/feed"),
+        ("DefenseScoop", "https://defensescoop.com/feed/"),
+    ],
     "Army": [
         ("Army Times", "https://www.armytimes.com/arc/outboundfeeds/rss/"),
         ("DVIDS Army", "https://www.dvidshub.net/rss/news?branch=Army"),
@@ -182,6 +199,31 @@ DEFENSE_SECTION_KEYWORDS = {
         "stryker",
         "abrams",
         "bradley",
+    ],
+    "Army Aviation": [
+        "army aviation",
+        "aviation brigade",
+        "combat aviation brigade",
+        "cab",
+        "army helicopter",
+        "army helicopters",
+        "black hawk",
+        "black hawks",
+        "uh-60",
+        "chinook",
+        "ch-47",
+        "apache",
+        "ah-64",
+        "lakota",
+        "uh-72",
+        "future vertical lift",
+        "fvl",
+        "flraa",
+        "valor",
+        "raider x",
+        "aviation battalion",
+        "medevac",
+        "air assault",
     ],
     "Marines": [
         "marine corps",
@@ -374,6 +416,26 @@ DEFENSE_SECTION_EXCLUDE_KEYWORDS = {
         "precision strike missile",
         "prsm",
     ],
+    "Army Aviation": [
+        "air force",
+        "usaf",
+        "navy",
+        "naval",
+        "frigate",
+        "destroyer",
+        "sailor",
+        "marine corps",
+        "marines",
+        "airline",
+        "commercial aviation",
+        "airport",
+        "aircraft carrier",
+        "fighter jet",
+        "bomber",
+        "space force",
+        "drone boat",
+        "submarine",
+    ],
     "Marines": [
         "merchant marine",
         "marine vessel",
@@ -471,6 +533,7 @@ NEWSLETTERS = {
         "sections": DEFENSE_SECTIONS,
         "section_keywords": DEFENSE_SECTION_KEYWORDS,
         "section_exclude_keywords": DEFENSE_SECTION_EXCLUDE_KEYWORDS,
+        "section_max_article_age_days": DEFENSE_SECTION_MAX_ARTICLE_AGE_DAYS,
         "preview_file": "latest_defense_newsletter.html",
         "user_agent": "defense-daily-newsletter/1.0 (+https://localhost)",
     },
@@ -804,6 +867,7 @@ def collect_section(
     keywords: list[str] | None = None,
     excluded_keywords: list[str] | None = None,
     target_count: int = 8,
+    max_age: dt.timedelta | None = None,
     newsletter_seen_links: set[str] | None = None,
     newsletter_seen_titles: set[str] | None = None,
     newsletter_seen_title_tokens: list[set[str]] | None = None,
@@ -813,7 +877,7 @@ def collect_section(
     seen_links: set[str] = set()
     seen_titles: set[str] = set()
     seen_title_tokens: list[set[str]] = []
-    recent_age = max_article_age()
+    recent_age = max_age or max_article_age()
 
     for source, url in feed_specs:
         source_articles: list[Article] = []
@@ -1022,17 +1086,22 @@ def build_newsletter(config: dict) -> tuple[str, str, dict[str, list[Article]]]:
     user_agent = config["user_agent"]
     section_keywords = config.get("section_keywords", {})
     section_exclude_keywords = config.get("section_exclude_keywords", {})
+    section_max_age_days = config.get("section_max_article_age_days", {})
     newsletter_seen_links: set[str] = set()
     newsletter_seen_titles: set[str] = set()
     newsletter_seen_title_tokens: list[set[str]] = []
     feed_cache: dict[tuple[str, str], list[Article]] = {}
     sections: dict[str, list[Article]] = {}
     for section, feeds in config["sections"].items():
+        section_max_age = None
+        if section in section_max_age_days:
+            section_max_age = dt.timedelta(days=section_max_age_days[section])
         sections[section] = collect_section(
             feeds,
             user_agent,
             section_keywords.get(section),
             section_exclude_keywords.get(section),
+            max_age=section_max_age,
             newsletter_seen_links=newsletter_seen_links,
             newsletter_seen_titles=newsletter_seen_titles,
             newsletter_seen_title_tokens=newsletter_seen_title_tokens,
