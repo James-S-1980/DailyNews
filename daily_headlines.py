@@ -54,60 +54,106 @@ GENERAL_SECTIONS = {
 }
 
 
+DEFENSE_CORE_FEEDS = [
+    ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
+    ("Military Times", "https://www.militarytimes.com/arc/outboundfeeds/rss/"),
+    ("Stars and Stripes", "https://subscribe.stripes.com/rss/top-news.xml"),
+    ("TWZ", "https://www.twz.com/feed"),
+    ("Breaking Defense", "https://breakingdefense.com/feed/"),
+    ("Defense One", "https://www.defenseone.com/rss/all/"),
+    ("RealClearDefense", "https://www.realcleardefense.com/index.xml"),
+    ("War on the Rocks", "https://warontherocks.com/feed/"),
+    ("DefenseScoop", "https://defensescoop.com/feed/"),
+]
+
+DEFENSE_ACQUISITION_FEEDS = [
+    ("GovCon Wire", "https://www.govconwire.com/feed/"),
+    ("ExecutiveGov", "https://executivegov.com/feed/"),
+    ("DefenseScoop", "https://defensescoop.com/feed/"),
+    ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
+    ("Breaking Defense", "https://breakingdefense.com/feed/"),
+    ("Defense One", "https://www.defenseone.com/rss/all/"),
+]
+
+DEFENSE_CYBER_FEEDS = [
+    ("CyberScoop", "https://cyberscoop.com/feed/"),
+    ("The Record", "https://therecord.media/feed"),
+    ("BleepingComputer", "https://www.bleepingcomputer.com/feed/"),
+    ("Dark Reading", "https://www.darkreading.com/rss.xml"),
+    ("DefenseScoop", "https://defensescoop.com/feed/"),
+    ("FedScoop", "https://fedscoop.com/feed/"),
+    ("Defense One", "https://www.defenseone.com/rss/all/"),
+    ("C4ISRNET", "https://www.c4isrnet.com/arc/outboundfeeds/rss/"),
+]
+
+DEFENSE_FMS_FEEDS = [
+    ("DSCA Major Arms Sales", "https://www.dsca.mil/DesktopModules/ArticleCS/RSS.ashx?ContentType=700&Site=1509&isdashboardselected=0&max=10"),
+    ("DSCA Press", "https://www.dsca.mil/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&SelectFeaturedContent=1&Site=1509&dashboardmoduleid=63543&formatxml=0&max=8"),
+    ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
+    ("Breaking Defense", "https://breakingdefense.com/feed/"),
+    ("Defense One", "https://www.defenseone.com/rss/all/"),
+    ("GovCon Wire", "https://www.govconwire.com/feed/"),
+    ("ExecutiveGov", "https://executivegov.com/feed/"),
+]
+
+
 DEFENSE_SECTIONS = {
-    "Defense Headlines": [
-        ("War.gov News", "https://www.war.gov/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=945&Category=16349&max=10"),
-        ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
-        ("Stars and Stripes", "https://subscribe.stripes.com/rss/top-news.xml"),
-        ("TWZ", "https://www.twz.com/feed"),
-        ("Breaking Defense", "https://breakingdefense.com/feed/"),
-        ("Defense One", "https://www.defenseone.com/rss/all/"),
-        ("Military Times", "https://www.militarytimes.com/arc/outboundfeeds/rss/"),
-        ("USNI News", "https://news.usni.org/feed"),
-        ("RealClearDefense", "https://www.realcleardefense.com/index.xml"),
-        ("War on the Rocks", "https://warontherocks.com/feed/"),
-    ],
-    "Military Services": [
+    "Army": [
         ("Army Times", "https://www.armytimes.com/arc/outboundfeeds/rss/"),
-        ("Air Force Times", "https://www.airforcetimes.com/arc/outboundfeeds/rss/"),
+        ("DVIDS Army", "https://www.dvidshub.net/rss/news?branch=Army"),
+        ("Army Technology", "https://www.army-technology.com/feed/"),
+        *DEFENSE_CORE_FEEDS,
+    ],
+    "Marines": [
         ("Marine Corps Times", "https://www.marinecorpstimes.com/arc/outboundfeeds/rss/"),
-        ("Navy Times", "https://www.navytimes.com/arc/outboundfeeds/rss/"),
-        ("Stars and Stripes U.S.", "https://subscribe.stripes.com/rss/us.xml"),
-        ("USNI News", "https://news.usni.org/feed"),
+        ("Marines", "https://www.marines.mil/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=481&max=10"),
+        ("DVIDS Marines", "https://www.dvidshub.net/rss/news?branch=Marines"),
+        *DEFENSE_CORE_FEEDS,
+    ],
+    "Air Force": [
+        ("Air Force Times", "https://www.airforcetimes.com/arc/outboundfeeds/rss/"),
         ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
         ("Air Force", "https://www.af.mil/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=1&Category=755&max=10"),
-        ("Army Technology", "https://www.army-technology.com/feed/"),
-        ("Naval Technology", "https://www.naval-technology.com/feed/"),
+        ("DVIDS Air Force", "https://www.dvidshub.net/rss/news?branch=Air%20Force"),
         ("Airforce Technology", "https://www.airforce-technology.com/feed/"),
+        *DEFENSE_CORE_FEEDS,
     ],
-    "Defense Technology & Industry": [
-        ("DARPA", "https://www.darpa.mil/rss.xml"),
-        ("C4ISRNET", "https://www.c4isrnet.com/arc/outboundfeeds/rss/"),
-        ("Breaking Defense", "https://breakingdefense.com/feed/"),
-        ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
-        ("TWZ", "https://www.twz.com/feed"),
-        ("Naval News", "https://www.navalnews.com/feed/"),
-        ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
-        ("GovCon Wire", "https://www.govconwire.com/feed/"),
-        ("ExecutiveGov", "https://executivegov.com/feed/"),
-        ("Army Technology", "https://www.army-technology.com/feed/"),
+    "Navy": [
+        ("Navy Times", "https://www.navytimes.com/arc/outboundfeeds/rss/"),
+        ("USNI News", "https://news.usni.org/feed"),
+        ("DVIDS Navy", "https://www.dvidshub.net/rss/news?branch=Navy"),
         ("Naval Technology", "https://www.naval-technology.com/feed/"),
-        ("Airforce Technology", "https://www.airforce-technology.com/feed/"),
+        ("Naval News", "https://www.navalnews.com/feed/"),
+        *DEFENSE_CORE_FEEDS,
     ],
     "C4ISR": [
         ("DARPA", "https://www.darpa.mil/rss.xml"),
         ("C4ISRNET", "https://www.c4isrnet.com/arc/outboundfeeds/rss/"),
-        ("Breaking Defense", "https://breakingdefense.com/feed/"),
-        ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
-        ("Defense One", "https://www.defenseone.com/rss/all/"),
-        ("TWZ", "https://www.twz.com/feed"),
         ("Air & Space Forces Magazine", "https://www.airandspaceforces.com/feed/"),
-        ("GovCon Wire", "https://www.govconwire.com/feed/"),
-        ("ExecutiveGov", "https://executivegov.com/feed/"),
         ("Airforce Technology", "https://www.airforce-technology.com/feed/"),
+        *DEFENSE_CORE_FEEDS,
+        *DEFENSE_ACQUISITION_FEEDS,
+    ],
+    "Cyber Security": [
+        *DEFENSE_CYBER_FEEDS,
+        *DEFENSE_CORE_FEEDS,
+    ],
+    "Foreign Military Sales": [
+        *DEFENSE_FMS_FEEDS,
+        *DEFENSE_CORE_FEEDS,
+    ],
+    "Defense Acquisition": [
+        *DEFENSE_ACQUISITION_FEEDS,
+        ("DARPA", "https://www.darpa.mil/rss.xml"),
+        ("C4ISRNET", "https://www.c4isrnet.com/arc/outboundfeeds/rss/"),
+        ("Army Technology", "https://www.army-technology.com/feed/"),
+        ("Naval Technology", "https://www.naval-technology.com/feed/"),
+        ("Airforce Technology", "https://www.airforce-technology.com/feed/"),
+        *DEFENSE_CORE_FEEDS,
     ],
     "Field Artillery": [
         ("Army Times", "https://www.armytimes.com/arc/outboundfeeds/rss/"),
+        ("DVIDS Army", "https://www.dvidshub.net/rss/news?branch=Army"),
         ("Military Times", "https://www.militarytimes.com/arc/outboundfeeds/rss/"),
         ("Defense News", "https://www.defensenews.com/arc/outboundfeeds/rss/"),
         ("Breaking Defense", "https://breakingdefense.com/feed/"),
@@ -115,20 +161,94 @@ DEFENSE_SECTIONS = {
         ("Defense One", "https://www.defenseone.com/rss/all/"),
         ("Defence Blog", "https://defence-blog.com/feed/"),
         ("Army Technology", "https://www.army-technology.com/feed/"),
+        ("DefenseScoop", "https://defensescoop.com/feed/"),
     ],
 }
 
 
 DEFENSE_SECTION_KEYWORDS = {
+    "Army": [
+        "army",
+        "soldier",
+        "soldiers",
+        "brigade",
+        "division",
+        "corps",
+        "fort ",
+        "land forces",
+        "ground combat",
+        "armored",
+        "infantry",
+        "stryker",
+        "abrams",
+        "bradley",
+    ],
+    "Marines": [
+        "marine corps",
+        "marines",
+        "usmc",
+        "littoral regiment",
+        "amphibious",
+        "expeditionary",
+        "marine expeditionary force",
+        "mef",
+        "maw",
+        "mcas",
+        "vmfa",
+        "camp foster",
+        "camp pendleton",
+        "camp lejeune",
+        "quantico",
+    ],
+    "Air Force": [
+        "air force",
+        "airman",
+        "airmen",
+        "usaf",
+        "fighter",
+        "bomber",
+        "aircraft",
+        "air wing",
+        "air base",
+        "f-35",
+        "f-22",
+        "f-15",
+        "f-16",
+        "b-21",
+        "b-52",
+        "kc-46",
+        "c-130",
+        "drone",
+        "uav",
+    ],
+    "Navy": [
+        "navy",
+        "naval",
+        "sailor",
+        "sailors",
+        "fleet",
+        "ship",
+        "ships",
+        "submarine",
+        "submarines",
+        "destroyer",
+        "frigate",
+        "aircraft carrier",
+        "carrier strike group",
+        "amphibious ready group",
+        "usni",
+        "marine vessel",
+    ],
     "C4ISR": [
         "c4isr",
         "command and control",
+        "command, control",
         "jadc2",
         "cjadc2",
         "sensor",
         "sensors",
         "electronic warfare",
-        "spectrum",
+        "electromagnetic spectrum",
         "cyber",
         "satellite",
         "space force",
@@ -140,6 +260,71 @@ DEFENSE_SECTION_KEYWORDS = {
         "communications",
         "data link",
         "radar",
+    ],
+    "Cyber Security": [
+        "cyber",
+        "cybersecurity",
+        "cyber security",
+        "cyberattack",
+        "cyber attack",
+        "cyber threat",
+        "malware",
+        "ransomware",
+        "breach",
+        "hack",
+        "hacker",
+        "zero trust",
+        "network security",
+        "critical infrastructure",
+        "vulnerability",
+        "cisa",
+        "nsa",
+    ],
+    "Foreign Military Sales": [
+        "foreign military sales",
+        "fms",
+        "major arms sale",
+        "major arms sales",
+        "arms sale",
+        "arms sales",
+        "arms transfer",
+        "weapons sale",
+        "missile sale",
+        "military sale",
+        "security cooperation",
+        "security assistance",
+        "congressional notification",
+        "foreign military financing",
+        "military aid",
+        "export approval",
+        "approved sale",
+        "support package",
+        "sale to",
+        "sales to",
+        "fms contract",
+        "fms contract modification",
+    ],
+    "Defense Acquisition": [
+        "acquisition",
+        "procurement",
+        "contract",
+        "contracts",
+        "contractor",
+        "award",
+        "awarded",
+        "solicitation",
+        "request for proposals",
+        "rfp",
+        "program office",
+        "program executive office",
+        "production",
+        "supplier",
+        "supply chain",
+        "industrial base",
+        "appropriation",
+        "prototype",
+        "vendor",
+        "technology demonstrator",
     ],
     "Field Artillery": [
         "field artillery",
@@ -154,6 +339,8 @@ DEFENSE_SECTION_KEYWORDS = {
         "mlrs",
         "himars",
         "m270",
+        "prsm",
+        "precision strike missile",
         "paladin",
         "m109",
         "155mm",
@@ -172,11 +359,77 @@ DEFENSE_SECTION_KEYWORDS = {
 }
 
 DEFENSE_SECTION_EXCLUDE_KEYWORDS = {
+    "Army": [
+        "marine corps",
+        "marines",
+        "navy",
+        "naval",
+        "submarine",
+        "sailor",
+        "air force",
+        "airman",
+        "field artillery",
+        "howitzer",
+        "himars",
+        "precision strike missile",
+        "prsm",
+    ],
+    "Marines": [
+        "merchant marine",
+        "marine vessel",
+        "submarine",
+    ],
+    "Air Force": [
+        "navy",
+        "naval",
+        "submarine",
+        "sailor",
+        "marine corps",
+        "marines",
+        "field artillery",
+        "howitzer",
+    ],
+    "Navy": [
+        "army",
+        "soldier",
+        "air force",
+        "airman",
+        "field artillery",
+        "howitzer",
+    ],
     "C4ISR": [
         "artillery",
         "howitzer",
         "himars",
         "mortar",
+    ],
+    "Cyber Security": [
+        "artillery",
+        "howitzer",
+        "shipbuilding",
+        "aircraft maintenance",
+    ],
+    "Foreign Military Sales": [
+        "cyberattack",
+        "cyber attack",
+        "ransomware",
+        "data breach",
+        "intern",
+        "internship",
+        "recruitment",
+        "pathways",
+    ],
+    "Defense Acquisition": [
+        "foreign military sales",
+        "major arms sale",
+        "major arms sales",
+        "congressional notification",
+        "cyberattack",
+        "ransomware",
+        "field artillery",
+        "howitzer",
+        "precision strike missile",
+        "prsm",
     ],
     "Field Artillery": [
         "submarine",
@@ -355,6 +608,45 @@ def article_key(article: Article) -> tuple[str, str]:
     return link, title
 
 
+def title_tokens(title: str) -> set[str]:
+    stop_words = {
+        "about",
+        "after",
+        "amid",
+        "and",
+        "are",
+        "for",
+        "from",
+        "has",
+        "have",
+        "how",
+        "into",
+        "its",
+        "new",
+        "says",
+        "that",
+        "the",
+        "this",
+        "with",
+    }
+    return {
+        token
+        for token in re.findall(r"[a-z0-9]+", title.lower())
+        if len(token) >= 3 and token not in stop_words
+    }
+
+
+def is_similar_title(tokens: set[str], previous_tokens: list[set[str]]) -> bool:
+    if len(tokens) < 4:
+        return False
+    for previous in previous_tokens:
+        overlap = len(tokens & previous)
+        smaller = min(len(tokens), len(previous))
+        if smaller >= 4 and overlap / smaller >= 0.6:
+            return True
+    return False
+
+
 def keyword_in_text(keyword: str, text: str) -> bool:
     escaped = re.escape(keyword.lower()).replace(r"\ ", r"\s+")
     return re.search(rf"(?<![a-z0-9]){escaped}(?![a-z0-9])", text) is not None
@@ -444,7 +736,7 @@ def is_probably_english(article: Article) -> bool:
     return True
 
 
-def fetch_feed(source: str, url: str, user_agent: str, max_items: int = 8) -> list[Article]:
+def fetch_feed(source: str, url: str, user_agent: str, max_items: int = 15) -> list[Article]:
     request = urllib.request.Request(
         url,
         headers={
@@ -514,21 +806,39 @@ def collect_section(
     target_count: int = 8,
     newsletter_seen_links: set[str] | None = None,
     newsletter_seen_titles: set[str] | None = None,
+    newsletter_seen_title_tokens: list[set[str]] | None = None,
+    feed_cache: dict[tuple[str, str], list[Article]] | None = None,
 ) -> list[Article]:
     articles_by_source: list[list[Article]] = []
     seen_links: set[str] = set()
     seen_titles: set[str] = set()
+    seen_title_tokens: list[set[str]] = []
     recent_age = max_article_age()
 
     for source, url in feed_specs:
         source_articles: list[Article] = []
-        for article in fetch_feed(source, url, user_agent):
+        feed_key = (source, url)
+        if feed_cache is not None and feed_key in feed_cache:
+            fetched_articles = feed_cache[feed_key]
+        else:
+            fetched_articles = fetch_feed(source, url, user_agent)
+            if feed_cache is not None:
+                feed_cache[feed_key] = fetched_articles
+            time.sleep(0.4)
+
+        for article in fetched_articles:
             link_key, title_key = article_key(article)
+            tokens = title_tokens(article.title)
             if (
                 link_key in seen_links
                 or title_key in seen_titles
+                or is_similar_title(tokens, seen_title_tokens)
                 or (newsletter_seen_links is not None and link_key in newsletter_seen_links)
                 or (newsletter_seen_titles is not None and title_key in newsletter_seen_titles)
+                or (
+                    newsletter_seen_title_tokens is not None
+                    and is_similar_title(tokens, newsletter_seen_title_tokens)
+                )
                 or is_obviously_stale(article)
                 or not is_recent(article, recent_age)
                 or not is_probably_english(article)
@@ -537,11 +847,11 @@ def collect_section(
                 continue
             seen_links.add(link_key)
             seen_titles.add(title_key)
+            seen_title_tokens.append(tokens)
             source_articles.append(article)
         source_articles.sort(key=lambda item: item.published, reverse=True)
         if source_articles:
             articles_by_source.append(source_articles)
-        time.sleep(0.4)
 
     selected: list[Article] = []
     index = 0
@@ -556,6 +866,8 @@ def collect_section(
                     newsletter_seen_links.add(link_key)
                 if newsletter_seen_titles is not None:
                     newsletter_seen_titles.add(title_key)
+                if newsletter_seen_title_tokens is not None:
+                    newsletter_seen_title_tokens.append(title_tokens(article.title))
                 added = True
                 if len(selected) == target_count:
                     break
@@ -712,6 +1024,8 @@ def build_newsletter(config: dict) -> tuple[str, str, dict[str, list[Article]]]:
     section_exclude_keywords = config.get("section_exclude_keywords", {})
     newsletter_seen_links: set[str] = set()
     newsletter_seen_titles: set[str] = set()
+    newsletter_seen_title_tokens: list[set[str]] = []
+    feed_cache: dict[tuple[str, str], list[Article]] = {}
     sections: dict[str, list[Article]] = {}
     for section, feeds in config["sections"].items():
         sections[section] = collect_section(
@@ -721,6 +1035,8 @@ def build_newsletter(config: dict) -> tuple[str, str, dict[str, list[Article]]]:
             section_exclude_keywords.get(section),
             newsletter_seen_links=newsletter_seen_links,
             newsletter_seen_titles=newsletter_seen_titles,
+            newsletter_seen_title_tokens=newsletter_seen_title_tokens,
+            feed_cache=feed_cache,
         )
     title = config["title"]
     issue_date = dt.datetime.now().date()

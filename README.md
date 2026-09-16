@@ -17,13 +17,17 @@ General newsletter:
 
 Defense newsletter:
 
-- Defense Headlines: War.gov News, Defense News, Stars and Stripes, TWZ, Breaking Defense, Defense One, Military Times, USNI News, RealClearDefense, War on the Rocks
-- Military Services: Army Times, Air Force Times, Marine Corps Times, Navy Times, Stars and Stripes U.S., USNI News, Air & Space Forces Magazine, Air Force, Army Technology, Naval Technology, Airforce Technology
-- Defense Technology & Industry: DARPA, C4ISRNET, Breaking Defense, Defense News, TWZ, Naval News, Air & Space Forces Magazine, GovCon Wire, ExecutiveGov, Army Technology, Naval Technology, Airforce Technology
-- C4ISR: DARPA, C4ISRNET, Breaking Defense, Defense News, Defense One, TWZ, Air & Space Forces Magazine, GovCon Wire, ExecutiveGov, Airforce Technology
-- Field Artillery: Army Times, Military Times, Defense News, Breaking Defense, TWZ, Defense One, Defence Blog, Army Technology
+- Army: Army Times, DVIDS Army, Army Technology, and broad defense feeds
+- Marines: Marine Corps Times, Marines.mil, DVIDS Marines, and broad defense feeds
+- Air Force: Air Force Times, Air & Space Forces Magazine, Air Force, DVIDS Air Force, Airforce Technology, and broad defense feeds
+- Navy: Navy Times, USNI News, DVIDS Navy, Naval Technology, Naval News, and broad defense feeds
+- C4ISR: DARPA, C4ISRNET, Air & Space Forces Magazine, Airforce Technology, broad defense feeds, and acquisition feeds
+- Cyber Security: CyberScoop, The Record, BleepingComputer, Dark Reading, DefenseScoop, FedScoop, Defense One, C4ISRNET, and broad defense feeds
+- Foreign Military Sales: DSCA Major Arms Sales, DSCA Press, Defense News, Breaking Defense, Defense One, GovCon Wire, ExecutiveGov, and broad defense feeds
+- Defense Acquisition: GovCon Wire, ExecutiveGov, DefenseScoop, FedScoop, DARPA, C4ISRNET, service technology feeds, and broad defense feeds
+- Field Artillery: Army Times, DVIDS Army, Military Times, Defense News, Breaking Defense, TWZ, Defense One, Defence Blog, Army Technology, DefenseScoop
 
-Each section includes up to 8 articles with a title, 2-3 sentence summary, source, and full article link. The C4ISR and Field Artillery sections use keyword filters to keep broad defense feeds focused on those topics. Each newsletter closes with a "This Day in History" item for the issue date.
+Each section includes up to 8 articles with a title, 2-3 sentence summary, source, and full article link. Defense newsletter sections use keyword and exclusion filters to keep broad feeds focused on the requested categories. Each newsletter closes with a "This Day in History" item for the issue date.
 
 ## Run a Preview
 
