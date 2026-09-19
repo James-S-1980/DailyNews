@@ -1,0 +1,15 @@
+services:
+  daily-newsletter:
+    build: .
+    container_name: daily-newsletter
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      TZ: America/New_York
+      PORT: "8774"
+      NEWSLETTER_RUN_AT: "04:00"
+    ports:
+      - "8774:8774"
+    volumes:
+      - ./logs:/app/logs

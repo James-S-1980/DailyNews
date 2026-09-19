@@ -1,9 +1,11 @@
 # Daily Newsletters
 
-This branch contains a daily newsletter job that sends two separate digests when it runs:
+This app sends two daily newsletter digests:
 
 - `Daily Headlines` goes to `james.schliesske@gmail.com`
 - `Defense Daily` goes to `James.d.schliesske.civ@army.mil`
+
+The app now runs as a Docker container. The container exposes a health/status endpoint on port `8774` and runs the newsletter job daily at 4:00 AM Eastern time.
 
 Both newsletters collect RSS headlines, summarize each item from the feed description, and include the source and full article link.
 
@@ -30,41 +32,66 @@ Defense newsletter:
 
 Each section includes up to 8 articles with a title, 2-3 sentence summary, source, and full article link. Defense newsletter sections use keyword and exclusion filters to keep broad feeds focused on the requested categories. Each newsletter closes with a "This Day in History" item for the issue date.
 
-## Run a Preview
-
-```powershell
-python .\daily_headlines.py --dry-run
-```
-
-The preview writes `latest_general_newsletter.html` and `latest_defense_newsletter.html`, then prints plain-text versions in the terminal.
-
-To preview only one newsletter:
-
-```powershell
-python .\daily_headlines.py --newsletter general --dry-run
-python .\daily_headlines.py --newsletter defense --dry-run
-```
-
-## Send Now
-
-```powershell
-.\run_newsletter.ps1
-```
-
-## Schedule for 4 AM Daily
-
-```powershell
-.\register_daily_task.ps1
-```
-
-The task is registered as `Daily Newsletters` in Windows Task Scheduler.
-
-Scheduled runs use `--once-per-day`, so the 4 AM task and logon catch-up will not send duplicate newsletters on the same date. The logon catch-up also uses `--not-before 04:00`, so logging in before 4 AM does not send early.
-
 ## Configuration
 
-Email configuration lives in `.env`. The file is intentionally ignored by Git because it contains the Gmail app password. Use `GENERAL_NEWSLETTER_RECIPIENT` and `DEFENSE_NEWSLETTER_RECIPIENT` to change destinations.
+Email configuration lives in `.env`. The file is intentionally ignored by Git because it contains the Gmail app password. `docker-compose.yml` loads this file into the container.
 
-By default, articles older than 3 days are excluded. Set `MAX_ARTICLE_AGE_DAYS` in `.env` to adjust the recency window.
+Required values:
 
-The Army Aviation section uses a 7-day recency window because fresh, narrowly Army aviation-specific RSS items are less frequent than broader defense news.
+```env
+GENERAL_NEWSLETTER_RECIPIENT=james.schliesske@gmail.com
+DEFENSE_NEWSLETTER_RECIPIENT=James.d.schliesske.civ@army.mil
+SMTP_USERNAME=james.schliesske@gmail.com
+SMTP_APP_PASSWORD=your-app-password
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+```
+
+Optional values:
+
+```env
+MAX_ARTICLE_AGE_DAYS=3
+NEWSLETTER_RUN_AT=04:00
+```
+
+By default, articles older than 3 days are excluded. The Army Aviation section uses a 7-day recency window because fresh, narrowly Army aviation-specific RSS items are less frequent than broader defense news.
+
+## Run The Container
+
+Build and start the container:
+
+```powershell
+docker compose up -d --build
+```
+
+Check status:
+
+```powershell
+curl http://localhost:8774/health
+```
+
+View logs:
+
+```powershell
+docker compose logs -f daily-newsletter
+```
+
+Stop the container:
+
+```powershell
+docker compose down
+```
+
+## Manual Runs
+
+Run a dry-run preview inside the container:
+
+```powershell
+docker compose run --rm daily-newsletter python daily_headlines.py --dry-run
+```
+
+Send both newsletters immediately:
+
+```powershell
+docker compose run --rm daily-newsletter python daily_headlines.py
+```
